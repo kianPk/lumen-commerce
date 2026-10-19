@@ -1,0 +1,12 @@
+{
+  "name": "lumen-commerce",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vue 3 storefront + Node checkout API",
+  "scripts": {
+    "dev:client": "npm run dev --prefix client",
+    "dev:server": "node server/index.js",
+    "build": "npm run build --prefix client",
+    "start": "node server/index.js"
+  }
+}
