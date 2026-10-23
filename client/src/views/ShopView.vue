@@ -1,5 +1,5 @@
 <script setup>
-import { state, filtered, addToCart } from '../store'
+import { state, filtered, addToCart, toggleWishlist } from '../store'
 import { formatPrice } from '../catalog'
 import ProductArt from '../components/ProductArt.vue'
 </script>
@@ -55,6 +55,9 @@ import ProductArt from '../components/ProductArt.vue'
           <p>{{ p.tagline }}</p>
           <div class="row actions">
             <span class="rating">★ {{ p.rating.toFixed(1) }}</span>
+            <button type="button" class="wish" @click="toggleWishlist(p.id)">
+              {{ state.wishlist.includes(p.id) ? 'Saved' : 'Save' }}
+            </button>
             <button type="button" class="add" @click="addToCart(p.id)">Add</button>
           </div>
         </div>
@@ -230,14 +233,16 @@ h2 {
   color: var(--sage);
   font-size: 0.85rem;
 }
-.add {
+.add, .wish {
   padding: 7px 12px;
   border-radius: 999px;
   border: 1px solid var(--line);
   color: var(--text);
   font-weight: 600;
   font-size: 0.85rem;
+  background: transparent;
 }
+.wish { color: var(--muted); }
 .add:hover {
   border-color: color-mix(in srgb, var(--copper) 50%, var(--line));
   background: color-mix(in srgb, var(--copper) 12%, transparent);

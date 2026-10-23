@@ -2,6 +2,8 @@ import { computed, reactive } from 'vue'
 import { CATALOG, CATEGORIES } from './catalog'
 
 const CART_KEY = 'lumen_cart'
+const WISH_KEY = 'lumen_wish'
+const COUPONS = { LUMEN10: 0.1, STONE15: 0.15 }
 
 function loadCart() {
   try {
@@ -11,10 +13,20 @@ function loadCart() {
   }
 }
 
+function loadWish() {
+  try {
+    return JSON.parse(localStorage.getItem(WISH_KEY) || '[]')
+  } catch {
+    return []
+  }
+}
+
 export const state = reactive({
   products: structuredClone(CATALOG),
   categories: [...CATEGORIES],
   cart: loadCart(),
+  wishlist: loadWish(),
+  coupon: '',
   query: '',
   category: 'all',
   sort: 'featured',
@@ -24,6 +36,7 @@ export const state = reactive({
 
 function persist() {
   localStorage.setItem(CART_KEY, JSON.stringify(state.cart))
+  localStorage.setItem(WISH_KEY, JSON.stringify(state.wishlist))
 }
 
 export function toast(msg) {
@@ -53,12 +66,33 @@ export const filtered = computed(() => {
 
 export const cartCount = computed(() => state.cart.reduce((n, i) => n + i.qty, 0))
 
-export const cartTotal = computed(() =>
+export const cartSubtotal = computed(() =>
   state.cart.reduce((sum, i) => {
     const p = state.products.find((x) => x.id === i.productId)
     return sum + (p ? p.price * i.qty : 0)
   }, 0),
 )
+
+export const discountRate = computed(() => COUPONS[state.coupon.trim().toUpperCase()] || 0)
+
+export const cartTotal = computed(() => {
+  const sub = cartSubtotal.value
+  return Math.round(sub * (1 - discountRate.value))
+})
+
+export function toggleWishlist(productId) {
+  const i = state.wishlist.indexOf(productId)
+  if (i >= 0) state.wishlist.splice(i, 1)
+  else state.wishlist.push(productId)
+  persist()
+  toast(i >= 0 ? 'Removed from wishlist' : 'Saved to wishlist')
+}
+
+export function applyCoupon(code) {
+  state.coupon = (code || '').trim().toUpperCase()
+  if (discountRate.value) toast(`Coupon ${state.coupon} applied`)
+  else if (state.coupon) toast('Unknown coupon')
+}
 
 export const cartLines = computed(() =>
   state.cart
