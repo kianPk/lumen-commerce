@@ -55,8 +55,15 @@ import ProductArt from '../components/ProductArt.vue'
           <p>{{ p.tagline }}</p>
           <div class="row actions">
             <span class="rating">★ {{ p.rating.toFixed(1) }}</span>
-            <button type="button" class="wish" @click="toggleWishlist(p.id)">
-              {{ state.wishlist.includes(p.id) ? 'Saved' : 'Save' }}
+            <button
+              type="button"
+              class="wish"
+              :class="{ on: state.wishlist.includes(p.id) }"
+              :aria-pressed="state.wishlist.includes(p.id)"
+              :aria-label="state.wishlist.includes(p.id) ? 'Remove from wishlist' : 'Add to wishlist'"
+              @click.stop="toggleWishlist(p.id)"
+            >
+              <span class="heart" aria-hidden="true">{{ state.wishlist.includes(p.id) ? '♥' : '♡' }}</span>
             </button>
             <button type="button" class="add" @click="addToCart(p.id)">Add</button>
           </div>
@@ -242,7 +249,20 @@ h2 {
   font-size: 0.85rem;
   background: transparent;
 }
-.wish { color: var(--muted); }
+.wish {
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  padding: 7px 10px;
+}
+.wish.on {
+  color: #e8a0a8;
+  border-color: color-mix(in srgb, #e8a0a8 40%, var(--line));
+  background: color-mix(in srgb, #e8a0a8 10%, transparent);
+}
+.heart { font-size: 1rem; line-height: 1; }
 .add:hover {
   border-color: color-mix(in srgb, var(--copper) 50%, var(--line));
   background: color-mix(in srgb, var(--copper) 12%, transparent);

@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { productBySlug, addToCart } from '../store'
+import { productBySlug, addToCart, toggleWishlist, state } from '../store'
 import { formatPrice } from '../catalog'
 import ProductArt from '../components/ProductArt.vue'
 
@@ -33,6 +33,14 @@ function buy() {
         <div class="actions">
           <button type="button" class="primary" @click="addToCart(product.id)">Add to bag</button>
           <button type="button" class="ghost" @click="buy">Buy now</button>
+          <button
+            type="button"
+            class="wish"
+            :class="{ on: state.wishlist.includes(product.id) }"
+            @click="toggleWishlist(product.id)"
+          >
+            {{ state.wishlist.includes(product.id) ? '♥ Wishlisted' : '♡ Wishlist' }}
+          </button>
         </div>
       </div>
     </div>
